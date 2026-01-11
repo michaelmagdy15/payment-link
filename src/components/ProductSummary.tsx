@@ -7,10 +7,8 @@ export const ProductSummary = () => {
         <div className="h-full flex flex-col p-8 lg:p-12 relative overflow-hidden bg-white text-slate-900 border-r border-slate-100">
 
             <div className="relative z-10 max-w-md mx-auto w-full">
-                <div className="flex items-center space-x-2 text-slate-900 font-bold mb-12">
-                    <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center">
-                        <div className="w-4 h-4 bg-gradient-to-tr from-blue-500 to-green-400 rounded-sm"></div>
-                    </div>
+                <div className="flex items-center space-x-3 text-slate-900 font-bold mb-12">
+                    <img src="/logo.png" alt="KAYE & CO Logo" className="h-10 w-10 object-contain" />
                     <span>KAYE & CO REAL ESTATE LLC</span>
                 </div>
 
@@ -47,7 +45,7 @@ export const ProductSummary = () => {
 
                 <div className="space-y-4 pt-8">
                     <div className="flex justify-between items-center text-sm font-medium">
-                        <span className="text-slate-900">KAYE & CO REAL ESTATE LLC</span>
+                        <span className="text-slate-900">Property ROI</span>
                         <span className="text-slate-900">{currency === 'AED' ? 'AED 100.00' : '€24.32'}</span>
                     </div>
                 </div>
