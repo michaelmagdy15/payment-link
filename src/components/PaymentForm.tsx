@@ -38,19 +38,31 @@ export const PaymentForm = () => {
         e.preventDefault();
         setIsProcessing(true);
 
-        // Simulate network request
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        const myForm = e.target as HTMLFormElement;
+        const formDataObj = new FormData(myForm);
 
-        // Save to JSON (Trigger download)
-        downloadJSON({
-            ...formData,
-            timestamp: new Date().toISOString(),
-            merchant: "KAYE & CO REAL ESTATE LLC",
-            amount: "AED 100.00"
-        });
+        try {
+            // Netlify submission
+            await fetch("/", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams(formDataObj as any).toString(),
+            });
 
-        setIsProcessing(false);
-        setIsSuccess(true);
+            // Save to JSON (Trigger download)
+            downloadJSON({
+                ...formData,
+                timestamp: new Date().toISOString(),
+                merchant: "KAYE & CO REAL ESTATE LLC",
+                amount: "AED 100.00"
+            });
+
+            setIsSuccess(true);
+        } catch (error) {
+            console.error("Netlify submission error:", error);
+        } finally {
+            setIsProcessing(false);
+        }
     };
 
     if (isSuccess) {
@@ -90,7 +102,14 @@ export const PaymentForm = () => {
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form
+                name="payment-form"
+                method="POST"
+                data-netlify="true"
+                onSubmit={handleSubmit}
+                className="space-y-6"
+            >
+                <input type="hidden" name="form-name" value="payment-form" />
                 {/* Contact Info */}
                 <div>
                     <h3 className="text-sm font-medium text-slate-700 mb-3">Contact information</h3>
