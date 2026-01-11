@@ -22,18 +22,6 @@ export const PaymentForm = () => {
         setFormData({ ...formData, [e.target.name]: value });
     };
 
-    const downloadJSON = (data: any) => {
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'payment_data.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsProcessing(true);
@@ -42,24 +30,16 @@ export const PaymentForm = () => {
         const formDataObj = new FormData(myForm);
 
         try {
-            // Netlify submission
+            // Submit to Netlify Forms (email notification configured in dashboard)
             await fetch("/", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 body: new URLSearchParams(formDataObj as any).toString(),
             });
 
-            // Save to JSON (Trigger download)
-            downloadJSON({
-                ...formData,
-                timestamp: new Date().toISOString(),
-                merchant: "KAYE & CO REAL ESTATE LLC",
-                amount: "AED 100.00"
-            });
-
             setIsSuccess(true);
         } catch (error) {
-            console.error("Netlify submission error:", error);
+            console.error("Submission error:", error);
         } finally {
             setIsProcessing(false);
         }
