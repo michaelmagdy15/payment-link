@@ -22,6 +22,28 @@ export const PaymentForm = () => {
         setFormData({ ...formData, [e.target.name]: value });
     };
 
+    const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // Only allow digits and spaces, format as groups of 4
+        const value = e.target.value.replace(/\D/g, '').slice(0, 16);
+        const formatted = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+        setFormData({ ...formData, cardNumber: formatted });
+    };
+
+    const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // Only allow digits, auto-insert slash after MM
+        let value = e.target.value.replace(/\D/g, '').slice(0, 4);
+        if (value.length >= 2) {
+            value = value.slice(0, 2) + ' / ' + value.slice(2);
+        }
+        setFormData({ ...formData, expiry: value });
+    };
+
+    const handleCvcChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // Only allow digits, max 4 characters
+        const value = e.target.value.replace(/\D/g, '').slice(0, 4);
+        setFormData({ ...formData, cvc: value });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsProcessing(true);
@@ -131,7 +153,10 @@ export const PaymentForm = () => {
                                             name="cardNumber"
                                             placeholder="1234 1234 1234 1234"
                                             className="w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 border-b border-slate-200"
-                                            onChange={handleChange}
+                                            value={formData.cardNumber}
+                                            onChange={handleCardNumberChange}
+                                            inputMode="numeric"
+                                            maxLength={19}
                                             required
                                         />
                                         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex space-x-1">
@@ -145,7 +170,10 @@ export const PaymentForm = () => {
                                             name="expiry"
                                             placeholder="MM / YY"
                                             className="w-1/2 px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400"
-                                            onChange={handleChange}
+                                            value={formData.expiry}
+                                            onChange={handleExpiryChange}
+                                            inputMode="numeric"
+                                            maxLength={7}
                                             required
                                         />
                                         <div className="relative w-1/2">
@@ -154,7 +182,10 @@ export const PaymentForm = () => {
                                                 name="cvc"
                                                 placeholder="CVC"
                                                 className="w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 pr-10"
-                                                onChange={handleChange}
+                                                value={formData.cvc}
+                                                onChange={handleCvcChange}
+                                                inputMode="numeric"
+                                                maxLength={4}
                                                 required
                                             />
                                             <CreditCard className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
