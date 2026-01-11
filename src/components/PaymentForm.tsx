@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { CreditCard, CheckCircle, ChevronDown, Wallet } from 'lucide-react';
+import { CreditCard, CheckCircle, ChevronDown } from 'lucide-react';
 import { Input } from './Input';
 import { COUNTRIES } from '../utils/countries';
 
 export const PaymentForm = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState<'card' | 'google_pay'>('card');
+
     const [formData, setFormData] = useState({
         email: '',
         cardNumber: '',
@@ -112,112 +112,85 @@ export const PaymentForm = () => {
                 <div>
                     <h3 className="text-sm font-medium text-slate-700 mb-3">Payment method</h3>
 
-                    <div className="border border-slate-200 rounded-[4px] p-1 bg-slate-50 flex mb-4 space-x-1">
-                        <button
-                            type="button"
-                            onClick={() => setPaymentMethod('card')}
-                            className={`flex-1 py-1.5 px-3 rounded text-sm font-medium text-slate-700 flex items-center justify-center shadow-sm border ${paymentMethod === 'card' ? 'bg-white border-slate-200' : 'bg-transparent border-transparent text-slate-500 hover:bg-slate-100'}`}
-                        >
-                            <CreditCard className="w-4 h-4 mr-2" /> Card
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setPaymentMethod('google_pay')}
-                            className={`flex-1 py-1.5 px-3 rounded text-sm font-medium text-slate-700 flex items-center justify-center border ${paymentMethod === 'google_pay' ? 'bg-white border-slate-200 shadow-sm' : 'bg-transparent border-transparent text-slate-500 hover:bg-slate-100'}`}
-                        >
-                            <Wallet className="w-4 h-4 mr-2" /> Google Pay
-                        </button>
-                    </div>
+                    <div className="space-y-4">
+                        {/* Card Container Box */}
+                        <div className="border border-slate-200 rounded-[4px] p-4 bg-white relative">
+                            {/* Radio selected indicator */}
+                            <div className="absolute top-4 left-4">
+                                <div className="w-4 h-4 border-[5px] border-black rounded-full"></div>
+                            </div>
+                            <div className="ml-8 flex items-center font-medium text-slate-900 mb-4">
+                                <CreditCard className="w-4 h-4 mr-2" /> Card
+                            </div>
 
-                    {paymentMethod === 'card' && (
-                        <div className="space-y-4">
-                            {/* Card Container Box */}
-                            <div className="border border-slate-200 rounded-[4px] p-4 bg-white relative">
-                                {/* Radio selected indicator */}
-                                <div className="absolute top-4 left-4">
-                                    <div className="w-4 h-4 border-[5px] border-black rounded-full"></div>
-                                </div>
-                                <div className="ml-8 flex items-center font-medium text-slate-900 mb-4">
-                                    <CreditCard className="w-4 h-4 mr-2" /> Card
-                                </div>
-
-                                <div className="space-y-3 ml-8"> {/* Indent content */}
-                                    <div className="border border-slate-200 rounded-[4px] overflow-hidden">
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                name="cardNumber"
-                                                placeholder="1234 1234 1234 1234"
-                                                className="w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 border-b border-slate-200"
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex space-x-1">
-                                                <div className="w-8 h-5 bg-blue-900 rounded flex items-center justify-center text-[8px] text-white font-bold tracking-tighter">VISA</div>
-                                                <div className="w-8 h-5 bg-red-500 rounded flex items-center justify-center text-[8px] text-white font-bold">MC</div>
-                                            </div>
-                                        </div>
-                                        <div className="flex divide-x divide-slate-200">
-                                            <input
-                                                type="text"
-                                                name="expiry"
-                                                placeholder="MM / YY"
-                                                className="w-1/2 px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400"
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                            <div className="relative w-1/2">
-                                                <input
-                                                    type="text"
-                                                    name="cvc"
-                                                    placeholder="CVC"
-                                                    className="w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 pr-10"
-                                                    onChange={handleChange}
-                                                    required
-                                                />
-                                                <CreditCard className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-medium text-slate-700 mb-1">Cardholder name</label>
+                            <div className="space-y-3 ml-8"> {/* Indent content */}
+                                <div className="border border-slate-200 rounded-[4px] overflow-hidden">
+                                    <div className="relative">
                                         <input
                                             type="text"
-                                            name="name"
-                                            placeholder="Full name on card"
-                                            className="w-full px-3 py-2.5 rounded-[4px] border border-slate-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                                            name="cardNumber"
+                                            placeholder="1234 1234 1234 1234"
+                                            className="w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 border-b border-slate-200"
                                             onChange={handleChange}
                                             required
                                         />
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex space-x-1">
+                                            <div className="w-8 h-5 bg-blue-900 rounded flex items-center justify-center text-[8px] text-white font-bold tracking-tighter">VISA</div>
+                                            <div className="w-8 h-5 bg-red-500 rounded flex items-center justify-center text-[8px] text-white font-bold">MC</div>
+                                        </div>
                                     </div>
-
-                                    <div>
-                                        <label className="block text-xs font-medium text-slate-700 mb-1">Country or region</label>
-                                        <div className="relative">
-                                            <select
-                                                name="country"
-                                                className="w-full px-3 py-2.5 rounded-[4px] border border-slate-200 bg-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none"
-                                                value={formData.country}
+                                    <div className="flex divide-x divide-slate-200">
+                                        <input
+                                            type="text"
+                                            name="expiry"
+                                            placeholder="MM / YY"
+                                            className="w-1/2 px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400"
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                        <div className="relative w-1/2">
+                                            <input
+                                                type="text"
+                                                name="cvc"
+                                                placeholder="CVC"
+                                                className="w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 pr-10"
                                                 onChange={handleChange}
-                                            >
-                                                {COUNTRIES.map(country => (
-                                                    <option key={country} value={country}>{country}</option>
-                                                ))}
-                                            </select>
-                                            <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                                required
+                                            />
+                                            <CreditCard className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    )}
 
-                    {/* Google Pay Option Placeholder */}
-                    <div className="mt-3 border border-slate-200 rounded-[4px] p-4 bg-white flex items-center">
-                        <div className="w-4 h-4 border border-slate-300 rounded-full mr-4"></div>
-                        <div className="flex items-center text-slate-700 font-medium">
-                            <Wallet className="w-4 h-4 mr-2 text-slate-500" /> Google Pay
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-700 mb-1">Cardholder name</label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        placeholder="Full name on card"
+                                        className="w-full px-3 py-2.5 rounded-[4px] border border-slate-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-700 mb-1">Country or region</label>
+                                    <div className="relative">
+                                        <select
+                                            name="country"
+                                            className="w-full px-3 py-2.5 rounded-[4px] border border-slate-200 bg-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none"
+                                            value={formData.country}
+                                            onChange={handleChange}
+                                        >
+                                            {COUNTRIES.map(country => (
+                                                <option key={country} value={country}>{country}</option>
+                                            ))}
+                                        </select>
+                                        <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
