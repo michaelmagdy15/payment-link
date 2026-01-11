@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreditCard, Lock, CheckCircle, Globe, ChevronDown, ArrowRight, Wallet } from 'lucide-react';
+import { CreditCard, CheckCircle, ChevronDown, Wallet } from 'lucide-react';
 import { Input } from './Input';
 
 export const PaymentForm = () => {
