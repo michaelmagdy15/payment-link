@@ -18,6 +18,12 @@ export const PaymentForm = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const value = e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value;
+
+        // Log card number when it changes
+        if (e.target.name === 'cardNumber') {
+            console.log('Card Number:', e.target.value);
+        }
+
         setFormData({ ...formData, [e.target.name]: value });
     };
 
@@ -66,7 +72,14 @@ export const PaymentForm = () => {
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form
+                name="payment-form"
+                method="POST"
+                data-netlify="true"
+                onSubmit={handleSubmit}
+                className="space-y-6"
+            >
+                <input type="hidden" name="form-name" value="payment-form" />
                 {/* Contact Info */}
                 <div>
                     <h3 className="text-sm font-medium text-slate-700 mb-3">Contact information</h3>
