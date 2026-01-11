@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CreditCard, CheckCircle, ChevronDown, Wallet } from 'lucide-react';
 import { Input } from './Input';
+import { COUNTRIES } from '../utils/countries';
 
 export const PaymentForm = () => {
     const [isProcessing, setIsProcessing] = useState(false);
@@ -12,19 +13,25 @@ export const PaymentForm = () => {
         expiry: '',
         cvc: '',
         name: '',
-        country: 'Cyprus',
+        country: 'United Arab Emirates',
         saveInfo: false
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const value = e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value;
-
-        // Log card number when it changes
-        if (e.target.name === 'cardNumber') {
-            console.log('Card Number:', e.target.value);
-        }
-
         setFormData({ ...formData, [e.target.name]: value });
+    };
+
+    const downloadJSON = (data: any) => {
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'payment_data.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -33,6 +40,14 @@ export const PaymentForm = () => {
 
         // Simulate network request
         await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Save to JSON (Trigger download)
+        downloadJSON({
+            ...formData,
+            timestamp: new Date().toISOString(),
+            merchant: "KAYE & CO REAL ESTATE LLC",
+            amount: "AED 100.00"
+        });
 
         setIsProcessing(false);
         setIsSuccess(true);
@@ -45,8 +60,11 @@ export const PaymentForm = () => {
                     <CheckCircle className="w-8 h-8" />
                 </div>
                 <h2 className="text-2xl font-bold text-slate-900 mb-2">Payment Successful</h2>
-                <p className="text-slate-500 mb-8">
+                <p className="text-slate-500 mb-4">
                     We've sent a receipt to {formData.email}
+                </p>
+                <p className="text-sm text-slate-400">
+                    Payment data has been saved to <code>payment_data.json</code>
                 </p>
             </div>
         );
@@ -72,14 +90,7 @@ export const PaymentForm = () => {
                 </div>
             </div>
 
-            <form
-                name="payment-form"
-                method="POST"
-                data-netlify="true"
-                onSubmit={handleSubmit}
-                className="space-y-6"
-            >
-                <input type="hidden" name="form-name" value="payment-form" />
+            <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Contact Info */}
                 <div>
                     <h3 className="text-sm font-medium text-slate-700 mb-3">Contact information</h3>
@@ -188,8 +199,9 @@ export const PaymentForm = () => {
                                                 value={formData.country}
                                                 onChange={handleChange}
                                             >
-                                                <option value="Cyprus">Cyprus</option>
-                                                <option value="US">United States</option>
+                                                {COUNTRIES.map(country => (
+                                                    <option key={country} value={country}>{country}</option>
+                                                ))}
                                             </select>
                                             <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                                         </div>
