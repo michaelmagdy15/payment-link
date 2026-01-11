@@ -83,10 +83,16 @@ export const PaymentForm = () => {
                 name="payment-form"
                 method="POST"
                 data-netlify="true"
+                data-netlify-honeypot="bot-field"
                 onSubmit={handleSubmit}
                 className="space-y-6"
             >
                 <input type="hidden" name="form-name" value="payment-form" />
+                <p className="hidden">
+                    <label>
+                        Don’t fill this out if you’re human: <input name="bot-field" />
+                    </label>
+                </p>
                 {/* Contact Info */}
                 <div>
                     <h3 className="text-sm font-medium text-slate-700 mb-3">Contact information</h3>
