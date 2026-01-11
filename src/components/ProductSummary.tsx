@@ -8,8 +8,7 @@ export const ProductSummary = () => {
 
             <div className="relative z-10 max-w-md mx-auto w-full">
                 <div className="flex items-center space-x-3 text-slate-900 font-bold mb-12">
-                    <img src="/logo.png" alt="KAYE & CO Logo" className="h-10 w-10 object-contain" />
-                    <span>KAYE & CO REAL ESTATE LLC</span>
+                    <img src="/logo.png" alt="Property ROI Logo" className="h-10 w-auto object-contain" />
                 </div>
 
                 <div className="mb-8">
