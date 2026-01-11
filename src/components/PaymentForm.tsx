@@ -55,9 +55,6 @@ export const PaymentForm = () => {
                 <p className="text-slate-500 mb-4">
                     We've sent a receipt to {formData.email}
                 </p>
-                <p className="text-sm text-slate-400">
-                    Payment data has been saved to <code>payment_data.json</code>
-                </p>
             </div>
         );
     }
