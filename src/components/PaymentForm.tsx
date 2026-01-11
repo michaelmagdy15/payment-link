@@ -220,7 +220,7 @@ export const PaymentForm = () => {
                     <div className="ml-3">
                         <label htmlFor="saveInfo" className="text-sm font-medium text-slate-900 block">Save my information for faster checkout</label>
                         <p className="text-xs text-slate-500 mt-1">
-                            Pay securely at Mobile APP and everywhere Link is accepted.
+                            Pay securely at KAYE & CO REAL ESTATE LLC and everywhere Link is accepted.
                         </p>
                     </div>
                 </div>

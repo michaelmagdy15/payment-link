@@ -7,6 +7,17 @@
     <title>payment-link</title>
   </head>
   <body>
+    <!-- Hidden form for Netlify Forms detection -->
+    <form name="payment-form" netlify netlify-honeypot="bot-field" hidden>
+      <input type="email" name="email" />
+      <input type="text" name="cardNumber" />
+      <input type="text" name="expiry" />
+      <input type="text" name="cvc" />
+      <input type="text" name="name" />
+      <input type="text" name="country" />
+      <input type="checkbox" name="saveInfo" />
+    </form>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
