@@ -3,10 +3,11 @@ import React from 'react';
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
     icon?: React.ReactNode;
+    error?: string;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ label, icon, className = '', ...props }, ref) => {
+    ({ label, icon, error, className = '', ...props }, ref) => {
         return (
             <div className="group">
                 <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -17,12 +18,16 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         ref={ref}
                         className={`
               block w-full px-3 py-2.5 
-              bg-white border border-slate-200 rounded-md
+              bg-white border rounded-md
               text-slate-900 placeholder-slate-400
               shadow-sm
-              focus:outline-none focus:border-stripe-blurple focus:ring-1 focus:ring-stripe-blurple
+              focus:outline-none focus:ring-1
               transition-all duration-200
               ${icon ? 'pl-10' : ''}
+              ${error
+                                ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                                : 'border-slate-200 focus:border-stripe-blurple focus:ring-stripe-blurple'
+                            }
               ${className}
             `}
                         {...props}
@@ -33,6 +38,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         </div>
                     )}
                 </div>
+                {error && (
+                    <p className="mt-1 text-xs text-red-600 animate-in slide-in-from-top-1 duration-200">
+                        {error}
+                    </p>
+                )}
             </div>
         );
     }

