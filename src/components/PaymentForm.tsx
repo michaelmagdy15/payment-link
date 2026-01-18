@@ -305,7 +305,7 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
                                             type="text"
                                             name="cardNumber"
                                             placeholder="1234 1234 1234 1234"
-                                            className={`w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 border-b ${errors.cardNumber ? 'border-red-200 bg-red-50' : 'border-slate-200'
+                                            className={`w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 border-b focus:ring-1 focus:ring-inset focus:ring-[#0074E4] focus:z-10 relative ${errors.cardNumber ? 'border-red-200 bg-red-50' : 'border-slate-200'
                                                 }`}
                                             value={formData.cardNumber}
                                             onChange={handleCardNumberChange}
@@ -319,8 +319,8 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
                                                 <AlertCircle className="w-5 h-5 text-red-500" />
                                             ) : (
                                                 <>
-                                                    <div className="w-8 h-5 bg-blue-900 rounded flex items-center justify-center text-[8px] text-white font-bold tracking-tighter">VISA</div>
-                                                    <div className="w-8 h-5 bg-red-500 rounded flex items-center justify-center text-[8px] text-white font-bold">MC</div>
+                                                    <img src="https://js.stripe.com/v3/fingerprinted/img/visa-729c05c240c4bdb47b03ac81d9945bfe.svg" alt="Visa" className="h-5" />
+                                                    <img src="https://js.stripe.com/v3/fingerprinted/img/mastercard-4d8844094130711885b5e41b28c9848f.svg" alt="Mastercard" className="h-5" />
                                                 </>
                                             )}
                                         </div>
@@ -332,12 +332,12 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
                                     )}
 
                                     <div className="flex divide-x divide-slate-200">
-                                        <div className="w-1/2">
+                                        <div className="w-1/2 relative">
                                             <input
                                                 type="text"
                                                 name="expiry"
                                                 placeholder="MM / YY"
-                                                className={`w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 ${errors.expiry ? 'bg-red-50' : ''
+                                                className={`w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 focus:ring-1 focus:ring-inset focus:ring-[#0074E4] focus:z-10 relative ${errors.expiry ? 'bg-red-50' : ''
                                                     }`}
                                                 value={formData.expiry}
                                                 onChange={handleExpiryChange}
@@ -357,7 +357,7 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
                                                 type="text"
                                                 name="cvc"
                                                 placeholder="CVC"
-                                                className={`w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 pr-10 ${errors.cvc ? 'bg-red-50' : ''
+                                                className={`w-full px-3 py-2.5 outline-none text-slate-900 placeholder-slate-400 pr-10 focus:ring-1 focus:ring-inset focus:ring-[#0074E4] focus:z-10 relative ${errors.cvc ? 'bg-red-50' : ''
                                                     }`}
                                                 value={formData.cvc}
                                                 onChange={handleCvcChange}
@@ -367,9 +367,16 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
                                                 required
                                             />
                                             {errors.cvc ? (
-                                                <AlertCircle className="w-4 h-4 text-red-500 absolute right-3 top-1/2 -translate-y-1/2" />
+                                                <AlertCircle className="w-4 h-4 text-red-500 absolute right-3 top-1/2 -translate-y-1/2 z-20" />
                                             ) : (
-                                                <CreditCard className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
+                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 z-20 opacity-50">
+                                                    <svg width="30" height="20" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M25.2061 0.00488281C27.3194 0.112115 29 1.85996 29 4V11.3291C28.5428 11.0304 28.0336 10.8304 27.5 10.7188V8H1.5V16C1.5 17.3807 2.61929 18.5 4 18.5H10.1104V20H4L3.79395 19.9951C1.7488 19.8913 0.108652 18.2512 0.00488281 16.2061L0 16V4C0 1.85996 1.68056 0.112115 3.79395 0.00488281L4 0H25L25.2061 0.00488281ZM4 1.5C2.61929 1.5 1.5 2.61929 1.5 4V5H27.5V4C27.5 2.61929 26.3807 1.5 25 1.5H4Z"></path>
+                                                        <path d="M27.5 12.7988C28.3058 13.1128 28.7725 13.7946 28.7725 14.6406C28.7722 15.4002 28.2721 15.9399 27.6523 16.1699C28.1601 16.3319 28.6072 16.6732 28.8086 17.2207C28.3597 18.6222 27.1605 19.6862 25.6826 19.9404C24.8389 19.7707 24.1662 19.2842 23.834 18.5H25C25.0914 18.5 25.1816 18.4939 25.2705 18.4844C25.5434 18.7862 25.9284 18.9501 26.3623 18.9502C27.142 18.9501 27.6922 18.5297 27.6924 17.79C27.6923 17.4212 27.5473 17.1544 27.2998 16.9795C27.4281 16.6786 27.5 16.3478 27.5 16V15.0527C27.5397 14.9481 27.5625 14.8309 27.5625 14.7002C27.5625 14.5657 27.5399 14.4422 27.5 14.3311V12.7988Z"></path>
+                                                        <path d="M15.2207 18.5V18.8301H16.8799V19.9004H12.1104V18.8301H13.9902V18.5H15.2207Z"></path>
+                                                        <path d="M19.9307 18.5L19.5762 18.7803H22.8369V19.9004H17.8164V18.8604L18.2549 18.5H19.9307Z"></path>
+                                                    </svg>
+                                                </div>
                                             )}
                                         </div>
                                     </div>
