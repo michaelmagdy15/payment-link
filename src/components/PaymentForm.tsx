@@ -55,20 +55,16 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
 
 
         try {
-            // Simulate processing delay then fail
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            setPaymentStatus('failed');
-
-            // Original success logic commented out for now as requested
-            /*
             await fetch("/", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams(formDataObj as any).toString(),
+                body: new URLSearchParams({
+                    "form-name": "payment-form",
+                    ...formData as any
+                }).toString(),
             });
 
-            setIsSuccess(true);
-            */
+            setPaymentStatus('success');
         } catch (error) {
             console.error("Submission error:", error);
             setPaymentStatus('failed');
