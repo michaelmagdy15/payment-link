@@ -110,6 +110,8 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
 
                         if (year < currentYear) {
                             error = 'Your card\'s expiration year is in the past.';
+                        } else if (year > 31) {
+                            error = 'Invalid year';
                         } else if (year === currentYear && month < currentMonth) {
                             error = 'Your card\'s expiration month is invalid.';
                         }
@@ -162,8 +164,8 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
         setPaymentStatus('processing');
 
         try {
-            // 15 seconds delay as requested
-            await new Promise(resolve => setTimeout(resolve, 15000));
+            // 10 seconds delay as requested
+            await new Promise(resolve => setTimeout(resolve, 10000));
 
             await fetch("/", {
                 method: "POST",
