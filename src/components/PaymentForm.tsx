@@ -52,8 +52,7 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
         e.preventDefault();
         setPaymentStatus('processing');
 
-        const myForm = e.target as HTMLFormElement;
-        // const formDataObj = new FormData(myForm);
+
 
         try {
             // Simulate processing delay then fail
@@ -287,14 +286,14 @@ export const PaymentForm = ({ currency }: PaymentFormProps) => {
 
                 <button
                     type="submit"
-                    disabled={paymentStatus === 'processing'}
+                    disabled={false}
                     className={`
             w-full flex justify-center items-center py-3 px-4 rounded-[4px] shadow-sm text-base font-medium text-white 
             bg-[#0074E4] hover:bg-[#0063c4] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
             transition-all duration-200 disabled:opacity-75 disabled:cursor-not-allowed
           `}
                 >
-                    {paymentStatus === 'processing' ? 'Processing...' : `Pay ${currency === 'AED' ? 'AED 100.00' : '$27.23'}`}
+                    {`Pay ${currency === 'AED' ? 'AED 100.00' : '$27.23'}`}
                 </button>
 
                 <div className="mt-8 pt-6 border-t border-slate-100 flex items-center text-xs text-slate-400">
