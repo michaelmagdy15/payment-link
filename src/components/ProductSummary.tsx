@@ -12,7 +12,7 @@ export const ProductSummary = ({ currency, setCurrency }: ProductSummaryProps) =
 
             <div className="relative z-10 max-w-md mx-auto w-full">
                 <div className="flex items-center space-x-3 text-slate-900 font-bold mb-12">
-                    <img src="/logo.png" alt="Property ROI Logo" className="h-10 w-auto object-contain" />
+                    <img src="/logo.png" alt="Property EOI Logo" className="h-10 w-auto object-contain" />
                 </div>
 
                 <div className="mb-8">
@@ -48,7 +48,7 @@ export const ProductSummary = ({ currency, setCurrency }: ProductSummaryProps) =
 
                 <div className="space-y-4 pt-8">
                     <div className="flex justify-between items-center text-sm font-medium">
-                        <span className="text-slate-900">Property ROI</span>
+                        <span className="text-slate-900">Property EOI</span>
                         <span className="text-slate-900">{currency === 'AED' ? 'AED 100.00' : '$27.23'}</span>
                     </div>
                 </div>
