@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { CreditCard, CheckCircle, ChevronDown } from 'lucide-react';
+import { CreditCard, CheckCircle, ChevronDown, XCircle, RefreshCw } from 'lucide-react';
 import { Input } from './Input';
 import { COUNTRIES } from '../utils/countries';
 
-export const PaymentForm = () => {
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [isSuccess, setIsSuccess] = useState(false);
+interface PaymentFormProps {
+    currency: 'AED' | 'USD';
+    onSuccess?: () => void;
+}
+
+export const PaymentForm = ({ currency }: PaymentFormProps) => {
+    const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'failed'>('idle');
 
     const [formData, setFormData] = useState({
         email: '',
@@ -46,13 +50,18 @@ export const PaymentForm = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsProcessing(true);
+        setPaymentStatus('processing');
 
         const myForm = e.target as HTMLFormElement;
-        const formDataObj = new FormData(myForm);
+        // const formDataObj = new FormData(myForm);
 
         try {
-            // Submit to Netlify Forms (email notification configured in dashboard)
+            // Simulate processing delay then fail
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            setPaymentStatus('failed');
+
+            // Original success logic commented out for now as requested
+            /*
             await fetch("/", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -60,14 +69,47 @@ export const PaymentForm = () => {
             });
 
             setIsSuccess(true);
+            */
         } catch (error) {
             console.error("Submission error:", error);
-        } finally {
-            setIsProcessing(false);
+            setPaymentStatus('failed');
         }
     };
 
-    if (isSuccess) {
+    if (paymentStatus === 'processing') {
+        return (
+            <div className="flex flex-col items-center justify-center h-full p-8 text-center animate-in fade-in zoom-in duration-300">
+                <div className="flex flex-col items-center">
+                    {/* Stripe-like spinner */}
+                    <div className="w-12 h-12 border-4 border-slate-200 border-t-[#0074E4] rounded-full animate-spin mb-6"></div>
+                    <h2 className="text-xl font-bold text-slate-900 mb-2">Processing payment...</h2>
+                    <p className="text-slate-500">Please do not refresh the page.</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (paymentStatus === 'failed') {
+        return (
+            <div className="flex flex-col items-center justify-center h-full p-8 text-center animate-in fade-in zoom-in duration-300">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6 text-red-600">
+                    <XCircle className="w-8 h-8" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">Payment Failed</h2>
+                <p className="text-slate-500 mb-6 max-w-xs mx-auto">
+                    Your card was declined. Please check your card details or try a different payment method.
+                </p>
+                <button
+                    onClick={() => setPaymentStatus('idle')}
+                    className="flex items-center justify-center py-2.5 px-6 rounded-[4px] shadow-sm text-sm font-medium text-white bg-[#0074E4] hover:bg-[#0063c4] transition-all"
+                >
+                    <RefreshCw className="w-4 h-4 mr-2" /> Try Again
+                </button>
+            </div>
+        );
+    }
+
+    if (paymentStatus === 'success') {
         return (
             <div className="flex flex-col items-center justify-center h-full p-8 text-center animate-in fade-in zoom-in duration-500">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6 text-green-600">
@@ -245,14 +287,14 @@ export const PaymentForm = () => {
 
                 <button
                     type="submit"
-                    disabled={isProcessing}
+                    disabled={paymentStatus === 'processing'}
                     className={`
             w-full flex justify-center items-center py-3 px-4 rounded-[4px] shadow-sm text-base font-medium text-white 
             bg-[#0074E4] hover:bg-[#0063c4] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
             transition-all duration-200 disabled:opacity-75 disabled:cursor-not-allowed
           `}
                 >
-                    {isProcessing ? 'Processing...' : 'Pay AED 100.00'}
+                    {paymentStatus === 'processing' ? 'Processing...' : `Pay ${currency === 'AED' ? 'AED 100.00' : '$27.23'}`}
                 </button>
 
                 <div className="mt-8 pt-6 border-t border-slate-100 flex items-center text-xs text-slate-400">
